@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pro Detailing — Профессиональный детейлинг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --gray: #888;
+    --white: #F5F5F5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor {
+    width: 10px; height: 10px; background: var(--gold); border-radius: 50%;
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px; border: 1px solid var(--gold); border-radius: 50%;
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9998;
+    transition: all 0.15s ease; opacity: 0.6;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    padding: 20px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.97), transparent);
+    transition: background 0.3s;
+  }
+  nav.scrolled { background: rgba(10,10,10,0.98); backdrop-filter: blur(10px); }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+    letter-spacing: 4px; color: var(--white); text-decoration: none; z-index: 201;
+  }
+  .logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    color: var(--gray); text-decoration: none; font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: transparent; border: 1px solid var(--gold); color: var(--gold);
+    padding: 9px 22px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--black); }
+
+  /* Бургер */
+  .burger {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none; cursor: pointer; padding: 4px; z-index: 201;
+  }
+  .burger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Мобильное меню */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 199;
+    background: rgba(10,10,10,0.99);
+    flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: 'Bebas Neue', sans-serif; font-size: 44px; letter-spacing: 4px;
+    color: var(--white); text-decoration: none; padding: 18px 0;
+    transition: color 0.2s; border-bottom: 1px solid rgba(255,255,255,0.06);
+    width: 80%; text-align: center;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-menu .mob-cta {
+    margin-top: 36px; background: var(--gold); color: var(--black);
+    padding: 16px 0; font-size: 13px; letter-spacing: 3px; font-weight: 600;
+    font-family: 'Montserrat', sans-serif; border: none; width: 80%;
+    text-align: center; font-size: 13px;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100svh; position: relative;
+    display: flex; align-items: center; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(201,168,76,0.05) 0%, transparent 40%),
+      linear-gradient(135deg, #0A0A0A 0%, #141414 50%, #0D0D0D 100%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; padding: 120px 60px 80px; max-width: 860px; }
+  .hero-tag {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 24px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 140px);
+    line-height: 0.9; letter-spacing: 2px;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title .accent { color: var(--gold); }
+  .hero-title .outline { -webkit-text-stroke: 1px var(--white); color: transparent; }
+  .hero-sub {
+    margin-top: 28px; font-size: 14px; font-weight: 300;
+    color: var(--gray); line-height: 1.9; max-width: 440px;
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-btns {
+    margin-top: 40px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn-primary {
+    background: var(--gold); color: var(--black); padding: 15px 36px;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+    font-family: 'Montserrat', sans-serif; border: none;
+    transition: all 0.3s; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-ghost {
+    color: var(--white); font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px; transition: gap 0.3s;
+  }
+  .btn-ghost:hover { gap: 16px; }
+  .btn-ghost::after { content: '→'; color: var(--gold); }
+  .hero-number {
+    position: absolute; right: 60px; bottom: 60px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 200px;
+    color: rgba(201,168,76,0.04); line-height: 1; pointer-events: none;
+    animation: fadeIn 1s 1s forwards; opacity: 0;
+  }
+
+  /* ─── STATS ─── */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--dark);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat { padding: 40px 32px; border-right: 1px solid rgba(255,255,255,0.06); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 56px; color: var(--gold); line-height: 1; }
+  .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-top: 6px; }
+
+  /* ─── SECTIONS ─── */
+  .section { padding: 100px 60px; }
+  .section-header { margin-bottom: 64px; }
+  .section-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; display: block; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 6vw, 80px); line-height: 1; letter-spacing: 2px; }
+  .section-title .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; }
+  .gold-line { width: 50px; height: 2px; background: var(--gold); margin-top: 28px; }
+
+  /* ─── SERVICES ─── */
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .service-card {
+    background: var(--dark2); padding: 44px 36px;
+    position: relative; overflow: hidden; transition: background 0.3s;
+  }
+  .service-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .service-card:hover { background: #1E1E1E; }
+  .service-card:hover::before { opacity: 1; }
+  .service-icon { font-size: 32px; margin-bottom: 20px; display: block; transition: color 0.3s; }
+  .service-card:hover .service-icon { color: var(--gold); }
+  .service-num { position: absolute; top: 20px; right: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 44px; color: rgba(255,255,255,0.04); }
+  .service-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; margin-bottom: 12px; }
+  .service-desc { font-size: 12px; color: var(--gray); line-height: 1.9; font-weight: 300; margin-bottom: 20px; }
+  .service-price { font-size: 13px; color: var(--gold); letter-spacing: 1px; }
+
+  /* ─── PROCESS ─── */
+  .process { background: var(--dark); }
+  .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+  .process-steps::before {
+    content: ''; position: absolute; top: 31px; left: 12.5%; right: 12.5%;
+    height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .step { padding: 0 20px; text-align: center; }
+  .step-num {
+    width: 62px; height: 62px; border: 1px solid var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--gold);
+    margin: 0 auto 28px; background: var(--dark); position: relative; z-index: 1; transition: all 0.3s;
+  }
+  .step:hover .step-num { background: var(--gold); color: var(--black); }
+  .step-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 10px; }
+  .step-desc { font-size: 12px; color: var(--gray); line-height: 1.8; font-weight: 300; }
+
+  /* ─── WHY ─── */
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .why-item { background: var(--dark2); padding: 44px; border-left: 3px solid transparent; transition: border-color 0.3s; }
+  .why-item:hover { border-left-color: var(--gold); }
+  .why-item h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 10px; }
+  .why-item p { font-size: 13px; color: var(--gray); line-height: 1.8; font-weight: 300; }
+
+  /* ─── REVIEWS ─── */
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .review { background: var(--dark2); padding: 36px; }
+  .review-stars { color: var(--gold); font-size: 13px; margin-bottom: 18px; letter-spacing: 2px; }
+  .review-text { font-size: 13px; color: var(--gray); line-height: 1.9; font-weight: 300; margin-bottom: 20px; font-style: italic; }
+  .review-author { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+  .review-car { font-size: 10px; color: var(--gold); letter-spacing: 1px; margin-top: 4px; }
+
+  /* ─── CONTACT ─── */
+  .contact { background: var(--dark); }
+  .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .contact-info h2 { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 2px; line-height: 0.9; margin-bottom: 28px; }
+  .contact-info h2 span { color: var(--gold); }
+  .contact-info > p { font-size: 14px; color: var(--gray); line-height: 1.8; font-weight: 300; margin-bottom: 36px; }
+  .contact-detail { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+  .contact-detail .icon { font-size: 18px; margin-top: 2px; }
+  .contact-detail .info { font-size: 14px; line-height: 1.6; }
+  .contact-detail .info small { display: block; font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+  .contact-form { display: flex; flex-direction: column; gap: 12px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  input, textarea, select {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 18px; color: var(--white);
+    font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 300;
+    outline: none; transition: border-color 0.3s; width: 100%;
+    border-radius: 0; -webkit-appearance: none;
+  }
+  input::placeholder, textarea::placeholder { color: var(--gray); }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  textarea { height: 110px; resize: none; }
+  select option { background: var(--dark); }
+  .submit-btn {
+    background: var(--gold); color: var(--black); border: none;
+    padding: 17px 40px; font-family: 'Montserrat', sans-serif;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%;
+  }
+  .submit-btn:hover { background: var(--gold-light); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 48px 60px; display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  footer p { font-size: 11px; color: var(--gray); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ════════════════════════════
+     📱 МОБИЛЬНАЯ ВЕРСИЯ
+  ════════════════════════════ */
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+
+    /* Навигация */
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    /* Прячем десктопную кнопку, показываем бургер */
+    .nav-cta { display: none; }
+    .burger { display: flex; }
+
+    /* Hero — запрещаем выход за край */
+    .hero { overflow: hidden; }
+    .hero-content { padding: 100px 20px 64px; max-width: 100%; }
+    .hero-title {
+      font-size: clamp(44px, 12vw, 68px);
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .hero-sub { font-size: 13px; max-width: 100%; margin-top: 20px; }
+    .hero-btns { flex-direction: column; align-items: stretch; gap: 12px; margin-top: 32px; }
+    .btn-primary { text-align: center; padding: 18px; font-size: 13px; }
+    .btn-ghost { justify-content: center; }
+    .hero-number { display: none; }
+
+    /* Статистика 2×2 */
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat { padding: 24px 18px; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .stat:nth-child(2n) { border-right: none; }
+    .stat:nth-last-child(-n+2) { border-bottom: none; }
+    .stat-num { font-size: 40px; }
+    .stat-label { font-size: 9px; letter-spacing: 1px; }
+
+    /* Секции */
+    .section { padding: 56px 20px; }
+    .section-header { margin-bottom: 36px; }
+    .section-title { font-size: clamp(34px, 10vw, 50px); }
+
+    /* Услуги — 1 колонка */
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { padding: 28px 22px; }
+    .service-name { font-size: 22px; }
+
+    /* Процесс — 2×2 */
+    .process-steps { grid-template-columns: 1fr 1fr; gap: 36px 20px; }
+    .process-steps::before { display: none; }
+    .step { padding: 0; }
+    .step-num { width: 52px; height: 52px; font-size: 22px; margin-bottom: 14px; }
+    .step-title { font-size: 18px; }
+
+    /* Преимущества — 1 колонка */
+    .why-grid { grid-template-columns: 1fr; }
+    .why-item { padding: 26px 20px; }
+
+    /* Отзывы — 1 колонка */
+    .reviews-grid { grid-template-columns: 1fr; }
+    .review { padding: 26px 20px; }
+
+    /* Контакты */
+    .contact-inner { grid-template-columns: 1fr; gap: 36px; }
+    .contact-info h2 { font-size: 46px; }
+    .form-row { grid-template-columns: 1fr; }
+    /* font-size 16px — iOS не делает zoom при фокусе */
+    input, textarea, select { font-size: 16px; padding: 14px 16px; }
+    .submit-btn { font-size: 12px; letter-spacing: 2px; }
+
+    /* Футер */
+    footer { flex-direction: column; gap: 10px; text-align: center; padding: 32px 20px; }
+  }
+
+  /* Совсем маленькие экраны */
+  @media (max-width: 390px) {
+    .hero-title { font-size: 40px; }
+    .section-title { font-size: 32px; }
+    .process-steps { grid-template-columns: 1fr; gap: 28px; }
+    .mobile-menu a { font-size: 36px; }
+    .stat-num { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- МОБИЛЬНОЕ МЕНЮ -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#services" onclick="closeMobileMenu()">Услуги</a>
+  <a href="#process" onclick="closeMobileMenu()">Процесс</a>
+  <a href="#reviews" onclick="closeMobileMenu()">Отзывы</a>
+  <a href="#contact" onclick="closeMobileMenu()">Контакты</a>
+  <a href="#contact" class="mob-cta" onclick="closeMobileMenu()">Записаться</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="logo" href="#">PRO<span>.</span>DETAILING</a>
+  <ul class="nav-links">
+    <li><a href="#services">Услуги</a></li>
+    <li><a href="#process">Процесс</a></li>
+    <li><a href="#reviews">Отзывы</a></li>
+    <li><a href="#contact">Контакты</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Записаться</button>
+  <button class="burger" id="burger" onclick="toggleMenu()" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Профессиональный автодетейлинг</p>
+    <h1 class="hero-title">ЧИСТОТА<br><span class="outline">СОВЕРШЕН</span><span class="accent">СТВА</span></h1>
+    <p class="hero-sub">Мы возвращаем автомобилям первозданный блеск. Профессиональное оборудование, сертифицированные материалы и мастера с опытом 8+ лет.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Записаться онлайн</a>
+      <a href="#services" class="btn-ghost">Наши услуги</a>
+    </div>
+  </div>
+  <div class="hero-number">01</div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num">850+</div><div class="stat-label">Довольных клиентов</div></div>
+  <div class="stat reveal"><div class="stat-num">8</div><div class="stat-label">Лет опыта</div></div>
+  <div class="stat reveal"><div class="stat-num">12</div><div class="stat-label">Услуг в каталоге</div></div>
+  <div class="stat reveal"><div class="stat-num">100%</div><div class="stat-label">Гарантия качества</div></div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-header reveal">
+    <span class="section-tag">Что мы делаем</span>
+    <h2 class="section-title">НАШИ <span class="outline">УСЛУГИ</span></h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <span class="service-icon">✦</span><span class="service-num">01</span>
+      <h3 class="service-name">Полировка кузова</h3>
+      <p class="service-desc">Устранение царапин, потёртостей и окислений. Восстанавливаем зеркальный блеск лакокрасочного покрытия.</p>
+      <span class="service-price">от 8 000 ₽</span>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-icon">◈</span><span class="service-num">02</span>
+      <h3 class="service-name">Химчистка салона</h3>
+      <p class="service-desc">Глубокая очистка всех поверхностей: кожа, ткань, пластик, потолок. Устранение любых загрязнений и запахов.</p>
+      <span class="service-price">от 5 000 ₽</span>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-icon">◇</span><span class="service-num">03</span>
+      <h3 class="service-name">Керамическое покрытие</h3>
+      <p class="service-desc">Защита кузова сроком до 5 лет. Нанокерамика образует твёрдый защитный слой с гидрофобным эффектом.</p>
+      <span class="service-price">от 25 000 ₽</span>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-icon">⬡</span><span class="service-num">04</span>
+      <h3 class="service-name">Антигравийная плёнка</h3>
+      <p class="service-desc">PPF плёнка защищает кузов от сколов, царапин и агрессивной среды. Прозрачная, незаметная, долговечная.</p>
+      <span class="service-price">от 15 000 ₽</span>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-icon">◉</span><span class="service-num">05</span>
+      <h3 class="service-name">Детейлинг двигателя</h3>
+      <p class="service-desc">Профессиональная мойка и обработка подкапотного пространства. Удаление масла, грязи, защитные составы.</p>
+      <span class="service-price">от 3 500 ₽</span>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-icon">✧</span><span class="service-num">06</span>
+      <h3 class="service-name">Комплексный детейлинг</h3>
+      <p class="service-desc">Полный цикл обработки снаружи и внутри. Максимальный результат для самых требовательных владельцев.</p>
+      <span class="service-price">от 35 000 ₽</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section process" id="process">
+  <div class="section-header reveal">
+    <span class="section-tag">Как мы работаем</span>
+    <h2 class="section-title">ПРОЦЕСС <span class="outline">РАБОТЫ</span></h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="process-steps">
+    <div class="step reveal"><div class="step-num">01</div><h3 class="step-title">Запись</h3><p class="step-desc">Оставьте заявку онлайн или позвоните. Выберем удобное время.</p></div>
+    <div class="step reveal"><div class="step-num">02</div><h3 class="step-title">Осмотр</h3><p class="step-desc">Мастер проводит диагностику и составляет план работ.</p></div>
+    <div class="step reveal"><div class="step-num">03</div><h3 class="step-title">Работа</h3><p class="step-desc">Выполняем все работы строго по технологии. Только профматериалы.</p></div>
+    <div class="step reveal"><div class="step-num">04</div><h3 class="step-title">Выдача</h3><p class="step-desc">Принимаете результат и получаете гарантию. Авто сияет!</p></div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-tag">Наши преимущества</span>
+    <h2 class="section-title">ПОЧЕМУ <span class="outline">МЫ</span></h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="why-grid">
+    <div class="why-item reveal"><h3>Профессиональное оборудование</h3><p>Работаем только с профессиональными полировальными машинками, парогенераторами и химией от ведущих мировых брендов.</p></div>
+    <div class="why-item reveal"><h3>Гарантия на все работы</h3><p>Даём письменную гарантию на каждую выполненную услугу. Если что-то не так — устраним бесплатно.</p></div>
+    <div class="why-item reveal"><h3>Фотофиксация до и после</h3><p>Фотографируем автомобиль до начала работ и после завершения. Вы видите реальный результат.</p></div>
+    <div class="why-item reveal"><h3>Индивидуальный подход</h3><p>Составляем персональную программу обработки, учитывая состояние покрытия, возраст авто и ваши цели.</p></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section" id="reviews" style="background: var(--dark);">
+  <div class="section-header reveal">
+    <span class="section-tag">Что говорят клиенты</span>
+    <h2 class="section-title">ОТЗЫВЫ <span class="outline">КЛИЕНТОВ</span></h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Привёз BMW после зимы в ужасном состоянии. После полировки и керамики — как с салона. Мастера настоящие профессионалы!"</p>
+      <div class="review-author">Алексей К.</div>
+      <div class="review-car">BMW 5 Series • Полировка + керамика</div>
+    </div>
+    <div class="review reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Делала химчистку салона — дети постарались. Убрали всё, включая пятна, которые считала постоянными. Очень довольна!"</p>
+      <div class="review-author">Марина В.</div>
+      <div class="review-car">Toyota RAV4 • Химчистка салона</div>
+    </div>
+    <div class="review reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Обращаюсь уже третий раз. Каждый раз результат превосходит ожидания. Цены адекватные, работают быстро. Всем рекомендую!"</p>
+      <div class="review-author">Дмитрий Р.</div>
+      <div class="review-car">Mercedes E-Class • Комплексный детейлинг</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-info reveal">
+      <h2>ЗАПИШИСЬ<br><span>ОНЛАЙН</span></h2>
+      <p>Оставьте заявку и мы свяжемся с вами в течение 15 минут для подтверждения записи.</p>
+      <div class="contact-detail"><span class="icon">📞</span><div class="info"><small>Телефон</small>+7 (999) 123-45-67</div></div>
+      <div class="contact-detail"><span class="icon">💬</span><div class="info"><small>Telegram / WhatsApp</small>@prodetailing</div></div>
+      <div class="contact-detail"><span class="icon">📍</span><div class="info"><small>Адрес</small>ул. Автомобильная, 1, Москва</div></div>
+      <div class="contact-detail"><span class="icon">🕐</span><div class="info"><small>Режим работы</small>Пн–Вс: 9:00 — 21:00</div></div>
+    </div>
+    <div class="contact-form reveal">
+      <div class="form-row">
+        <input type="text" placeholder="Ваше имя" autocomplete="name">
+        <input type="tel" placeholder="Телефон" autocomplete="tel">
+      </div>
+      <select>
+        <option value="" disabled selected>Выберите услугу</option>
+        <option>Полировка кузова</option>
+        <option>Химчистка салона</option>
+        <option>Керамическое покрытие</option>
+        <option>Антигравийная плёнка</option>
+        <option>Детейлинг двигателя</option>
+        <option>Комплексный детейлинг</option>
+      </select>
+      <input type="text" placeholder="Марка и модель автомобиля">
+      <textarea placeholder="Дополнительные пожелания (необязательно)"></textarea>
+      <button class="submit-btn" onclick="handleSubmit(event)">Отправить заявку →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">PRO<span>.</span>DETAILING</div>
+  <p>© 2024 Pro Detailing. Все права защищены.</p>
+  <p>Сделано с ❤️ к автомобилям</p>
+</footer>
+
+<script>
+  // Кастомный курсор
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 5 + 'px'; cursor.style.top = my - 5 + 'px';
+  });
+  (function animRing() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx - 18 + 'px'; ring.style.top = ry - 18 + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // Бургер
+  function toggleMenu() {
+    const burger = document.getElementById('burger');
+    const menu = document.getElementById('mobileMenu');
+    burger.classList.toggle('open');
+    menu.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobileMenu() {
+    document.getElementById('burger').classList.remove('open');
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Nav scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal
+  new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 }).observe(document.body) || (() => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  })();
+
+  // Нормальный reveal
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  // Счётчики
+  function animCounter(el, target, suffix = '') {
+    const step = target / 60; let cur = 0;
+    const t = setInterval(() => {
+      cur = Math.min(cur + step, target);
+      el.textContent = Math.floor(cur) + suffix;
+      if (cur >= target) clearInterval(t);
+    }, 16);
+  }
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.stat-num').forEach(n => {
+        const txt = n.textContent;
+        if (txt.includes('+')) animCounter(n, parseInt(txt), '+');
+        else if (txt.includes('%')) animCounter(n, parseInt(txt), '%');
+        else animCounter(n, parseInt(txt));
+      });
+    });
+  }, { threshold: 0.4 }).observe(document.querySelector('.stats'));
+
+  // Форма
+  function handleSubmit(e) {
+    const btn = e.target;
+    btn.textContent = '✓ Заявка отправлена!';
+    btn.style.cssText = 'background:#2a7a2a;color:#fff;cursor:default;width:100%;padding:17px 40px;border:none;font-family:Montserrat,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;';
+    setTimeout(() => {
+      btn.textContent = 'Отправить заявку →';
+      btn.style.cssText = '';
+    }, 3000);
+  }
+</script>
+</body>
+</html>
